@@ -11,8 +11,10 @@ from .profiles import validate_selection
 SR = 16000
 
 
-def load_sources(seconds=10):
+def load_sources(seconds=10, scene="recorded"):
     """Repeat five-second environmental clips; speech uses its first ten seconds."""
+    if scene not in ("recorded", "audible_hum"):
+        raise ValueError("scene must be recorded or audible_hum")
     import librosa
     from demo1.data import demo_clips
     paths = dict(demo_clips())
@@ -23,11 +25,21 @@ def load_sources(seconds=10):
         n = int(seconds * SR)
         repeated = len(x) < n
         x = np.tile(x, int(np.ceil(n/len(x))))[:n].astype(float)
+        if scene == "audible_hum" and name == "engine":
+            t = np.arange(n)/SR
+            x = np.sin(2*np.pi*200*t)+0.3*np.sin(2*np.pi*400*t)+0.1*np.sin(2*np.pi*600*t)
+            rms = 0.16
+        if scene == "audible_hum" and name == "keyboard":
+            rms = 0.025
         x -= np.mean(x)
         gain = rms / max(np.sqrt(np.mean(x*x)), 1e-12)
         sources[name] = x * gain
         provenance[name] = {"file":paths[label].name, "repeated_to_length":repeated,
                             "rms_after_scaling":rms, "input_gain":float(gain)}
+        if scene == "audible_hum" and name == "engine":
+            provenance[name].update(file=None, repeated_to_length=False,
+                                    generator="Synthetic 200 Hz hum plus 400/600 Hz harmonics; not a real engine recording")
+        provenance[name]["scene"] = scene
     return sources, provenance
 
 

@@ -4,19 +4,22 @@
       "file": "1-18527-A-44.wav",
       "repeated_to_length": true,
       "rms_after_scaling": 0.12,
-      "input_gain": 1.5846252380499708
+      "input_gain": 1.5846252380499708,
+      "scene": "recorded"
     },
     "keyboard": {
       "file": "1-137-A-32.wav",
       "repeated_to_length": true,
       "rms_after_scaling": 0.1,
-      "input_gain": 8.991671216182256
+      "input_gain": 8.991671216182256,
+      "scene": "recorded"
     },
     "speech": {
       "file": "libri1.ogg",
       "repeated_to_length": false,
       "rms_after_scaling": 0.12,
-      "input_gain": 1.0446185609930014
+      "input_gain": 1.0446185609930014,
+      "scene": "recorded"
     }
   },
   "versions": {
@@ -360,6 +363,116 @@
       "limits": "Simulation only; exact stationary paths, early noise references, no actuator clipping. Speech metrics are reference-based proxies, not intelligibility scores."
     }
   },
+  "audible_hum_example": {
+    "source_provenance": {
+      "engine": {
+        "file": null,
+        "repeated_to_length": false,
+        "rms_after_scaling": 0.16,
+        "input_gain": 0.21574395598823745,
+        "generator": "Synthetic 200 Hz hum plus 400/600 Hz harmonics; not a real engine recording",
+        "scene": "audible_hum"
+      },
+      "keyboard": {
+        "file": "1-137-A-32.wav",
+        "repeated_to_length": true,
+        "rms_after_scaling": 0.025,
+        "input_gain": 2.247917804045564,
+        "scene": "audible_hum"
+      },
+      "speech": {
+        "file": "libri1.ogg",
+        "repeated_to_length": false,
+        "rms_after_scaling": 0.12,
+        "input_gain": 1.0446185609930014,
+        "scene": "audible_hum"
+      }
+    },
+    "metrics": {
+      "selected_for_reduction": [
+        "engine"
+      ],
+      "preserve_speech": true,
+      "reference_mode": "oracle: separately known source tracks, no source separation",
+      "sample_rate_hz": 16000,
+      "seconds": 10.0,
+      "measurement_window_s": [
+        5.0,
+        10.0
+      ],
+      "total_noise_reduction_db": 13.138731053865156,
+      "selected_residual_reduction_db": 15.903160713245924,
+      "speech_reference_sdr_before_db": -2.9725287349384795,
+      "speech_reference_sdr_after_db": 10.166202318926675,
+      "speech_counterfactual_distortion_rms_percent": 22.243064569273834,
+      "speech_counterfactual_gain": 0.9979221104958071,
+      "whole_run_noise_reduction_db": 11.677873475863036,
+      "mu": 0.004,
+      "controller_taps": 64,
+      "primary_fir": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.8,
+        0.15,
+        -0.05
+      ],
+      "secondary_fir": [
+        0.0,
+        0.0,
+        -0.003253643932349073,
+        -0.0044450271314173204,
+        -0.004456079587628707,
+        0.004620575898274236,
+        0.031059094789761647,
+        0.0761651992718336,
+        0.1300488685731482,
+        0.17443328828776938,
+        0.19165544766121584,
+        0.17443328828776938,
+        0.1300488685731482,
+        0.07616519927183363,
+        0.031059094789761647,
+        0.0046205758982742345,
+        -0.004456079587628707,
+        -0.004445027131417326,
+        -0.003253643932349073
+      ],
+      "uncorrelated_ear_disturbance_std": 0.001,
+      "seed": 107,
+      "limits": "Simulation only; exact stationary paths, early noise references, no actuator clipping. Speech metrics are reference-based proxies, not intelligibility scores.",
+      "scene": "audible_hum"
+    }
+  },
   "qiskit_qaoa": {
     "status": "PRELIMINARY: toy offline simulation; no quantum advantage claim",
     "backend": "qiskit",
@@ -391,8 +504,8 @@
     ],
     "optimizer_success": true,
     "objective_evaluations": 265,
-    "exact_argmin_seconds": 1.8999999156221747e-05,
-    "qaoa_optimization_seconds": 1.1005350000014005,
+    "exact_argmin_seconds": 1.6999998479150236e-05,
+    "qaoa_optimization_seconds": 1.1757878999997047,
     "timing_scope": "Shared cost table excluded; timings are illustrative, not a scaling study"
   }
 }

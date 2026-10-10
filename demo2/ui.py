@@ -4,12 +4,15 @@ import ipywidgets as widgets
 from IPython.display import display
 from .profiles import PROFILE_DIR, save_profile, load_profile, list_profiles
 from .simulation import load_sources, simulate
-from .presentation import show_result
+from .presentation import show_result, show_sources
 
 
 def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
     output_directory = Path(output_directory or Path(__file__).parent/"local"/"latest")
     name = widgets.Text(value="default", description="Profile name:")
+    scene = widgets.Dropdown(options=[("Audible 200 Hz synthetic hum + quieter keyboard", "audible_hum"),
+                                     ("Original low-bass engine recording + keyboard", "recorded")],
+                             value="audible_hum", description="Scene:", layout=widgets.Layout(width="620px"))
     engine = widgets.Checkbox(value=True, description="Reduce engine")
     keyboard = widgets.Checkbox(value=False, description="Reduce keyboard (experimental)", indent=False)
     preserve = widgets.Checkbox(value=True, description="Preserve speech", disabled=True)
@@ -17,9 +20,25 @@ def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
     load_button = widgets.Button(description="Load profile")
     save_button = widgets.Button(description="Save preferences", button_style="info")
     run_button = widgets.Button(description="Run cancellation", button_style="success")
+    listen_button = widgets.Button(description="Hear each source")
     status = widgets.Label(value="Select sounds, then run. Preferences are saved only when you click Save.")
     output = widgets.Output()
-    state = {"sources":None, "last_result":None}
+    state = {"sources":None, "scene":None, "last_result":None}
+
+    def ensure_sources():
+        if state["sources"] is None or state["scene"] != scene.value:
+            state["sources"], _ = load_sources(scene=scene.value)
+            state["scene"] = scene.value
+
+    def listen(_):
+        with output:
+            output.clear_output(wait=True)
+            try:
+                ensure_sources()
+                show_sources(state["sources"])
+                status.value = "Solo sources are identification aids, not before/after comparisons."
+            except Exception as error:
+                status.value = f"Could not load sources: {error}"
 
     def selection():
         return [key for key, control in [("engine",engine),("keyboard",keyboard)] if control.value]
@@ -54,9 +73,9 @@ def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
         with output:
             output.clear_output(wait=True)
             try:
-                if state["sources"] is None:
-                    state["sources"], _ = load_sources()
+                ensure_sources()
                 result = simulate(state["sources"], selection())
+                result.metrics["scene"] = scene.value
                 state["last_result"] = result
                 show_result(result, output_directory)
                 status.value = "Finished. Compare playback and metrics; negative reduction means amplification."
@@ -68,16 +87,19 @@ def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
 
     saved.observe(choose, names="value")
     save_button.on_click(save); load_button.on_click(load); run_button.on_click(run)
+    listen_button.on_click(listen)
     if "default" in list_profiles(profile_directory):
         load(None)
     box = widgets.VBox([
         widgets.HTML("<h3>Choose what to reduce</h3><p>Speech + engine + keyboard, with separately known source references. "
-                     "Offline ear-signal simulation; not live microphone separation or hardware ANC.</p>"),
+                     "No siren is included. The default scene uses a synthetic 200 Hz hum and quieter keyboard for an easier listening example. "
+                     "Choose the original recording for the unchanged benchmark. Offline simulation, not live hardware ANC.</p>"),
+        widgets.HBox([scene, listen_button]),
         widgets.HBox([engine, keyboard]), preserve,
         widgets.HBox([name, saved]), widgets.HBox([save_button, load_button, run_button]), status, output])
     # Expose controls for callback-level regression tests and notebook customization.
     controls = {"name":name,"engine":engine,"keyboard":keyboard,"save":save_button,
-                "load":load_button,"run":run_button,"status":status,"state":state}
+                "load":load_button,"run":run_button,"status":status,"state":state,"scene":scene,"listen":listen_button}
     return box, controls
 
 

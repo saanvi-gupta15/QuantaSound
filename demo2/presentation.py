@@ -55,7 +55,31 @@ def show_result(result, directory):
     display(Audio(filename=str(before)))
     print("After — do not adjust player volume between comparisons")
     display(Audio(filename=str(after)))
+    # Sequential playback uses the exact exported samples and a single player
+    # volume. It does not normalize each half or change the measured signals.
+    import soundfile as sf
+    a, sr = sf.read(before)
+    b, _ = sf.read(after)
+    split = len(a)//2
+    pair = np.r_[a[split:], np.zeros(sr//2), b[split:]]
+    pair_path = metrics.parent/"before_then_after.wav"
+    sf.write(pair_path, pair, sr, subtype="PCM_16")
+    duration = (len(a)-split)/sr
+    print(f"Quick A/B: BEFORE (final {duration:g} s), 0.5 s silence, AFTER (same final {duration:g} s). One player, unchanged gain.")
+    display(Audio(filename=str(pair_path)))
     figure = plot_result(result)
     display(figure)
     plt.close(figure)
     print(f"Saved audio and full metrics in {metrics.parent}")
+
+
+def show_sources(sources, sr=16000):
+    """Identification-only auditions, explicitly independently scaled."""
+    from IPython.display import Audio, display
+    print("Sources present: engine/hum, keyboard and speech. There is NO siren in this mixture.")
+    print("Each solo below is independently scaled for identification, NOT for judging cancellation or mixture balance.")
+    for name in ("engine", "keyboard", "speech"):
+        x = sources[name]
+        print(name)
+        peak = max(float(np.max(np.abs(x))), 1e-12)
+        display(Audio(0.7*x/peak, rate=sr, normalize=False))

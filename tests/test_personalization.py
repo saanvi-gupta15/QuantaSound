@@ -66,7 +66,7 @@ def test_qiskit_matches_numpy_probabilities():
 def test_python_widget_save_load_and_run_callbacks(tmp_path, sources, monkeypatch):
     import demo2.ui as ui
     seen = []
-    monkeypatch.setattr(ui, "load_sources", lambda: (sources, {}))
+    monkeypatch.setattr(ui, "load_sources", lambda **kwargs: (sources, {}))
     monkeypatch.setattr(ui, "show_result", lambda result, directory: seen.append(result))
     _, controls = ui.build_controls(tmp_path, tmp_path/"audio")
     controls["engine"].value = False
@@ -78,3 +78,21 @@ def test_python_widget_save_load_and_run_callbacks(tmp_path, sources, monkeypatc
     restored["run"].click()
     assert seen[0].metrics["selected_for_reduction"] == ["keyboard"]
     assert not restored["run"].disabled
+
+
+def test_audible_scene_is_explicit_and_does_not_replace_recorded_source(tmp_path, monkeypatch):
+    import soundfile as sf
+    import demo1.data
+    from demo2.simulation import load_sources
+    t = np.arange(16000)/16000
+    path = tmp_path/"original.wav"
+    sf.write(path, .2*np.sin(2*np.pi*40*t), 16000)
+    labels = ["engine", "keyboard_typing", "speech (LibriSpeech, separate from ESC-50)"]
+    monkeypatch.setattr(demo1.data, "demo_clips", lambda: [(name,path) for name in labels])
+    original, _ = load_sources(seconds=1)
+    audible, info = load_sources(seconds=1, scene="audible_hum")
+    assert np.argmax(np.abs(np.fft.rfft(original["engine"]))) == 40
+    assert np.argmax(np.abs(np.fft.rfft(audible["engine"]))) == 200
+    assert info["engine"]["file"] is None
+    assert "Synthetic" in info["engine"]["generator"]
+    assert np.sqrt(np.mean(audible["keyboard"]**2)) == pytest.approx(.025)

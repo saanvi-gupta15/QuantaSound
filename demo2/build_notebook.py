@@ -86,6 +86,21 @@ Run `python -m demo2.run` to export all four selections to `demo2/results/`; `py
 
 References: [Qiskit Statevector](https://docs.quantum.ibm.com/api/qiskit/2.0/qiskit.quantum_info.Statevector), [QAOA paper](https://arxiv.org/abs/1411.4028), [ESC-50](https://github.com/karolpiczak/ESC-50).""")
     ]
+    cells[2:2] = [
+        md("""## Listen here first: audible hum demonstration
+**There is no siren in this mixture.** The original engine recording is dominated by very low bass (around 37 Hz), which may be weak on laptop speakers. In the recorded-engine result, about 93% of the before-minus-after signal energy is below 100 Hz; the whole mixed audio changes by only about 1.87 dB over the full recording, even though the selected-target residual metric is larger.
+
+This additional listening example deliberately uses a **synthetic 200 Hz hum with harmonics**, plus speech and a quieter keyboard track. It is not the original engine recording and is an easier teaching scenario. The original recording/results remain below. Its levels are documented separately, not substituted into the original benchmark.
+
+First identify the individual sources below. Solo players are independently scaled only for identification. Then compare the full mixture before/after using the single quick A/B player, which preserves exactly the same gain for both halves."""),
+        code("""from demo2.presentation import show_sources
+audible_sources, audible_provenance = load_sources(scene='audible_hum')
+show_sources(audible_sources)
+audible_result = simulate(audible_sources, ['engine'])
+audible_result.metrics['scene'] = 'audible_hum'
+show_result(audible_result, root/'demo2'/'local'/'notebook_audible_hum')
+print(json.dumps(audible_provenance, indent=2))""")
+    ]
     for i, cell in enumerate(cells):
         cell.id = f"personalization-{i:02d}"
     notebook = nbf.v4.new_notebook(cells=cells, metadata={

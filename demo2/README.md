@@ -9,6 +9,14 @@ python -m jupyterlab demo2/Personalization.ipynb
 
 Select the environment where requirements were installed, then Run All. In the interface, choose engine and/or keyboard to reduce; speech remains designated for preservation. Click Run cancellation, compare playback and read the metrics. Enter a profile name and Save preferences. Choose a saved name and Load profile to restore it. Reopening automatically loads a saved `default` profile if one exists.
 
+### If before and after sound similar
+
+There is **no siren** in these mixtures. The original engine example is very low bass: the removed signal peaks around 37 Hz and about 93% of its energy is below 100 Hz. The full mixed recording changes by only about 1.87 dB; wanted speech and keyboard clicks remain. This can make the difference difficult to hear on small speakers. The embedded audio was checked against the exported WAVs; the before and after files are distinct and correctly embedded.
+
+The notebook now starts with a separately labeled **audible-hum demonstration**: a generated 200 Hz tone with 400/600 Hz harmonics (RMS 0.16), speech (RMS 0.12) and quieter keyboard clicks (RMS 0.025). It is an easier synthetic teaching case, not improved performance on the real-engine benchmark. The scene selector defaults to this example; choose the original recording to reproduce the previous results. Sound preferences persist, while scene choice is an experiment setting and is not saved in the preference profile.
+
+**Hear each source** provides solo auditions, individually scaled for identification only. The new **quick A/B** player plays the final five seconds before, half a second of silence, then the same five seconds after, using exactly the existing pair's shared gain. This makes comparison easier without increasing the claimed reduction. Keep the player volume unchanged; avoid playing before and after simultaneously.
+
 ## What changed
 
 1. **Selection:** choose engine, keyboard, both or neither for a mixture of actual recordings.
