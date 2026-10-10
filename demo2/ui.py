@@ -10,6 +10,10 @@ from .presentation import show_result, show_sources
 def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
     output_directory = Path(output_directory or Path(__file__).parent/"local"/"latest")
     name = widgets.Text(value="default", description="Profile name:")
+    controller = widgets.Dropdown(options=[("Original: adaptive + low-pass speaker", "adaptive_lowpass"),
+        ("Calibration only: same low-pass speaker", "calibrated_lowpass"),
+        ("Ideal comparison: calibrated + DIFFERENT broadband speaker", "calibrated_broadband")],
+        description="Model:", layout=widgets.Layout(width="680px"))
     scene = widgets.Dropdown(options=[("Audible 200 Hz synthetic hum + quieter keyboard", "audible_hum"),
                                      ("Original low-bass engine recording + keyboard", "recorded")],
                              value="audible_hum", description="Scene:", layout=widgets.Layout(width="620px"))
@@ -74,7 +78,7 @@ def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
             output.clear_output(wait=True)
             try:
                 ensure_sources()
-                result = simulate(state["sources"], selection())
+                result = simulate(state["sources"], selection(), controller=controller.value)
                 result.metrics["scene"] = scene.value
                 state["last_result"] = result
                 show_result(result, output_directory)
@@ -95,6 +99,7 @@ def build_controls(profile_directory=PROFILE_DIR, output_directory=None):
                      "No siren is included. The default scene uses a synthetic 200 Hz hum and quieter keyboard for an easier listening example. "
                      "Choose the original recording for the unchanged benchmark. Offline simulation, not live hardware ANC.</p>"),
         widgets.HBox([scene, listen_button]),
+        controller,
         widgets.HBox([engine, keyboard]), preserve,
         widgets.HBox([name, saved]), widgets.HBox([save_button, load_button, run_button]), status, output])
     # Expose controls for callback-level regression tests and notebook customization.

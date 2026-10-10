@@ -34,6 +34,16 @@ The controller adapts on the full simulated error-microphone signal including sp
 
 ### Recorded results (final 5–10 seconds)
 
+**Keyboard removal is not achieved by the original low-pass FxLMS model.** Its 2.49 dB target reduction is a limitation case, not a claim of successful removal. The notebook now includes two explicitly separated calibration experiments on the identical original mixture:
+
+| Controller / speaker assumption | Keyboard-target residual reduction | Interpretation |
+|---|---:|---|
+| Original adaptive, low-pass speaker | 2.49 dB | Clicks remain |
+| Fixed calibrated FIR, same low-pass speaker | 4.69 dB | Limited improvement; high control effort |
+| Fixed calibrated FIR, **different ideal broadband speaker** | 38.91 dB | Ideal known-reference feasibility example, not the original hardware |
+
+Calibration solves a regularized least-squares FIR path-matching problem using P and S, not the test audio. Both calibrated cases propagate a reference-driven control signal through the secondary path. Zero speech adaptation error is by construction for the fixed controller; no learned separation or hardware success is implied. No actuator clipping is modeled; `control_rms` and `control_peak` report required effort in arbitrary simulation units. Use the notebook's **Model** selector to compare assumptions; the original adaptive setup remains the default.
+
 | Selection | Total noise reduction | Selected-target residual reduction | Speech counterfactual error RMS |
 |---|---:|---:|---:|
 | Preserve all | 0.00 dB | Not applicable | 0.00% |

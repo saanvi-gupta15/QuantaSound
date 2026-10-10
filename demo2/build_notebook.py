@@ -41,10 +41,21 @@ Assumptions: one shared primary FIR with 32-sample delay, a known secondary FIR 
 engine_result = simulate(sources, ['engine'])
 show_result(engine_result, root/'demo2'/'local'/'notebook_engine')
 print(json.dumps(provenance, indent=2))"""),
-        md("""## 3 · Experimental case: reduce keyboard, preserve speech and engine
-Keyboard impacts span a broad frequency range. The modeled low-pass secondary path limits what can be canceled. Separately known early references are favorable assumptions; this result is not a real-world keyboard-removal guarantee. Negative reduction means the controller made the measured residual worse, and is retained honestly."""),
+        md("""## 3 · Keyboard: original setup gives weak reduction, not removal
+The original result below is a **limitation case**: about 2.49 dB selected-target residual reduction. Keyboard impacts span a broad frequency range, and this 1.5 kHz low-pass speaker model cannot reproduce much of the required anti-noise. The clicks remain audible. See the explicitly different calibrated-model comparisons immediately below; do not present this original case as successful keyboard removal."""),
         code("""keyboard_result = simulate(sources, ['keyboard'])
 show_result(keyboard_result, root/'demo2'/'local'/'notebook_keyboard')"""),
+        md("""### Keyboard comparison: calibration versus speaker bandwidth
+We fit a fixed 64-tap control FIR so `S*W ≈ P` with an effort penalty of 0.001. Calibration uses the known paths only, **not the evaluation recording**. At playback, the isolated keyboard reference passes through W and then S to produce anti-noise; this is not direct subtraction of keyboard samples from the output.
+
+First keep the **same low-pass speaker**: about 4.69 dB target reduction, still incomplete, with a large required control peak. Next use a **DIFFERENT ideal broadband speaker path** `[0, 0, 0.7, 0.2, −0.05]`: about 38.91 dB target reduction. The second result is an ideal feasibility illustration, not improved performance on the original speaker model. Both have exact, early, separately known noise references and omit actuator clipping; controller output peaks are reported in arbitrary simulation units.
+
+The fixed controller does not adapt to speech, so zero speech counterfactual error is **by construction**, not an independently demonstrated speech-separation achievement. The engine remains because only the keyboard is selected."""),
+        code("""for model in ('calibrated_lowpass', 'calibrated_broadband'):
+    print('MODEL:', model)
+    comparison = simulate(sources, ['keyboard'], controller=model)
+    show_result(comparison, root/'demo2'/'local'/model)
+    print('Control RMS / peak:', comparison.metrics['control_rms'], comparison.metrics['control_peak'])"""),
         md("""## 4 · Reading the measurements
 - **Total residual-noise reduction:** 10 log₁₀(power(before − clean speech) / power(after − clean speech)). This includes unselected noise and any controller artifacts; it need not be large when preserving another noisy source.
 - **Selected-target residual reduction:** compare selected-source-plus-floor power with `after − wanted`. Wanted includes speech and unselected sounds. This is a reference-based residual metric, not an isolated-source measurement from a real microphone.

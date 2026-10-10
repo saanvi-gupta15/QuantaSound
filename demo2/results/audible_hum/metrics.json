@@ -3,6 +3,9 @@
     "engine"
   ],
   "preserve_speech": true,
+  "controller_scenario": "adaptive_lowpass",
+  "controller_description": "Online FxLMS, low-pass secondary path",
+  "speech_metric_interpretation": "Paired adaptive reruns",
   "reference_mode": "oracle: separately known source tracks, no source separation",
   "sample_rate_hz": 16000,
   "seconds": 10.0,
@@ -18,6 +21,9 @@
   "speech_counterfactual_gain": 0.9979221104958071,
   "whole_run_noise_reduction_db": 11.677873475863036,
   "mu": 0.004,
+  "calibration_regularization": null,
+  "control_rms": 0.1508801118414095,
+  "control_peak": 0.47777413332943885,
   "controller_taps": 64,
   "primary_fir": [
     0.0,

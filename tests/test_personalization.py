@@ -63,6 +63,22 @@ def test_qiskit_matches_numpy_probabilities():
                                    np.abs(statevector(angles,costs))**2, atol=1e-12)
 
 
+def test_calibrated_broadband_on_unseen_transients(sources):
+    from scipy.signal import lfilter
+    from demo2.simulation import calibrated_fir
+    rng = np.random.default_rng(451)
+    sources['keyboard'] = .08*rng.normal(size=32000)
+    result = simulate(sources, ['keyboard'], controller='calibrated_broadband')
+    p, s = result.metrics['primary_fir'], result.metrics['secondary_fir']
+    w = calibrated_fir(p, s)
+    np.testing.assert_allclose(result.anti_noise_at_ear,
+                               -lfilter(s, [1], lfilter(w, [1], sources['keyboard'])), atol=1e-14)
+    assert result.metrics['selected_residual_reduction_db'] > 25
+    assert result.metrics['speech_counterfactual_distortion_rms_percent'] == 0
+    lowpass = simulate(sources, ['keyboard'], controller='calibrated_lowpass')
+    assert lowpass.metrics['selected_residual_reduction_db'] < result.metrics['selected_residual_reduction_db']
+
+
 def test_python_widget_save_load_and_run_callbacks(tmp_path, sources, monkeypatch):
     import demo2.ui as ui
     seen = []

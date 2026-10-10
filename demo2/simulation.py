@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import json
 import numpy as np
-from scipy import signal
+from scipy import signal, linalg
 import soundfile as sf
 from demo1.dsp import fxlms, power_db_ratio
 from .profiles import validate_selection
@@ -56,13 +56,27 @@ class PersonalizedResult:
     sr: int
 
 
-def simulate(sources, reduce=("engine",), sr=SR):
-    """Controller adapts on full ear error, including wanted speech.
+def calibrated_fir(primary, secondary, length=64, regularization=0.001):
+    """Fit S*W to P using paths only, never evaluation audio; penalize effort."""
+    matrix = linalg.convolution_matrix(secondary, length)
+    if len(primary) > len(matrix) or regularization <= 0:
+        raise ValueError("Invalid calibration length or regularization")
+    target = np.pad(primary, (0, len(matrix)-len(primary)))
+    return np.linalg.lstsq(np.vstack([matrix, np.sqrt(regularization)*np.eye(length)]),
+                           np.r_[target, np.zeros(length)], rcond=None)[0]
+
+
+def simulate(sources, reduce=("engine",), sr=SR, controller="adaptive_lowpass"):
+    """Adaptive baseline or explicitly calibrated fixed-controller comparison.
 
     Reference = sum of separately known selected tracks; NOT separation from
     the mixture. One scalar controller, shared source primary path, known FIR
-    secondary path, ideal preview. No direct target subtraction at the output.
+    secondary path, ideal preview. The adaptive baseline uses full ear error;
+    calibration uses paths only and freezes the controller. No direct source
+    subtraction at the output.
     """
+    if controller not in ("adaptive_lowpass", "calibrated_lowpass", "calibrated_broadband"):
+        raise ValueError("Unknown controller scenario")
     selection = validate_selection(reduce)
     if set(sources) != {"engine", "keyboard", "speech"}:
         raise ValueError("Provide engine, keyboard and speech source arrays")
@@ -75,15 +89,27 @@ def simulate(sources, reduce=("engine",), sr=SR):
     p = np.r_[np.zeros(32), 0.8, 0.15, -0.05]
     # Low-pass speaker model limits high-frequency click cancellation.
     s = np.r_[np.zeros(2), signal.firwin(17, 1500, fs=sr)]
+    if controller == "calibrated_broadband":
+        s = np.array([0., 0., 0.7, 0.2, -0.05])
     ear = {key:signal.lfilter(p, [1], value) for key, value in arrays.items()}
     floor = np.random.default_rng(107).normal(0, 0.001, n)
     selected = sum((arrays[key] for key in selection), np.zeros(n))
     target = sum((ear[key] for key in selection), np.zeros(n))
     wanted = sum((ear[key] for key in arrays if key not in selection), np.zeros(n))
     before = sum(ear.values(), np.zeros(n)) + floor
-    if selection:
+    control = np.zeros(n)
+    if selection and controller != "adaptive_lowpass":
+        # Frozen offline path calibration: no speech is used to update weights.
+        # The known noise reference drives an actual control FIR and secondary FIR.
+        weights = calibrated_fir(p, s)
+        control = signal.lfilter(weights, [1], selected)
+        anti_noise = -signal.lfilter(s, [1], control)
+        after = before+anti_noise
+        speech_delta = ear["speech"].copy()  # fixed reference-only controller: by construction
+    elif selection:
         result = fxlms(selected, p, s, length=64, mu=0.004, additive_disturbance=wanted+floor)
         after = result.error
+        control = result.control
         anti_noise = -result.secondary_output
         # Re-run the SAME controller experiment without speech. Difference
         # includes speech-driven adaptation changes, not just an untouched stem.
@@ -102,6 +128,12 @@ def simulate(sources, reduce=("engine",), sr=SR):
     speech_error_energy = float(np.mean(speech_error[tail]**2))
     metrics = {
         "selected_for_reduction":selection, "preserve_speech":True,
+        "controller_scenario":controller,
+        "controller_description":("Online FxLMS, low-pass secondary path" if controller == "adaptive_lowpass"
+            else "Offline calibrated fixed FIR; " + ("same low-pass path" if controller == "calibrated_lowpass"
+                 else "DIFFERENT ideal broadband secondary path; not original hardware")),
+        "speech_metric_interpretation":("Paired adaptive reruns" if controller == "adaptive_lowpass"
+            else "Zero speech adaptation error is by construction: frozen controller and exact isolated noise reference"),
         "reference_mode":"oracle: separately known source tracks, no source separation",
         "sample_rate_hz":sr, "seconds":n/sr, "measurement_window_s":[n/(2*sr), n/sr],
         "total_noise_reduction_db":power_db_ratio(residual_before[tail], residual_after[tail]),
@@ -113,7 +145,10 @@ def simulate(sources, reduce=("engine",), sr=SR):
         "speech_counterfactual_gain":float(np.dot(speech_delta[tail], ear["speech"][tail]) /
                                            max(np.dot(ear["speech"][tail], ear["speech"][tail]), 1e-20)),
         "whole_run_noise_reduction_db":power_db_ratio(residual_before, residual_after),
-        "mu":0.004, "controller_taps":64, "primary_fir":p.tolist(), "secondary_fir":s.tolist(),
+        "mu":0.004 if controller == "adaptive_lowpass" else None,
+        "calibration_regularization":None if controller == "adaptive_lowpass" else 0.001,
+        "control_rms":float(np.sqrt(np.mean(control**2))), "control_peak":float(np.max(np.abs(control))),
+        "controller_taps":64, "primary_fir":p.tolist(), "secondary_fir":s.tolist(),
         "uncorrelated_ear_disturbance_std":0.001, "seed":107,
         "limits":"Simulation only; exact stationary paths, early noise references, no actuator clipping. "
                  "Speech metrics are reference-based proxies, not intelligibility scores."

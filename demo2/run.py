@@ -27,6 +27,15 @@ def main():
         plt.close(figure)
         report["scenarios"][name] = result.metrics
     print("Running separate synthetic audible-hum listening example", flush=True)
+    report["keyboard_model_comparison"] = {}
+    for model in ("calibrated_lowpass", "calibrated_broadband"):
+        result = simulate(sources, ["keyboard"], controller=model)
+        folder = RESULTS/model
+        export_result(result, folder)
+        figure = plot_result(result)
+        figure.savefig(folder/"comparison.png", dpi=120)
+        plt.close(figure)
+        report["keyboard_model_comparison"][model] = result.metrics
     audible, provenance = load_sources(scene="audible_hum")
     result = simulate(audible, ["engine"])
     result.metrics["scene"] = "audible_hum"

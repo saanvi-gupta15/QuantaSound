@@ -41,7 +41,8 @@ def plot_result(result):
         ax.grid(alpha=.15)
     selected = ", ".join(result.metrics["selected_for_reduction"]) or "none"
     fig.suptitle(f"Known-reference ANC simulation · reduce {selected} · preserve speech\n"
-                 f"Total noise reduction: {result.metrics['total_noise_reduction_db']:.2f} dB; measured {start:g}–{end:g} s")
+                 f"{result.metrics.get('controller_scenario', 'adaptive_lowpass')} · total reduction: "
+                 f"{result.metrics['total_noise_reduction_db']:.2f} dB; measured {start:g}–{end:g} s")
     return fig
 
 
@@ -49,6 +50,8 @@ def show_result(result, directory):
     from IPython.display import Audio, HTML, display
     from .simulation import export_result
     before, after, metrics = export_result(result, directory)
+    print(result.metrics.get("controller_description", "Online FxLMS"))
+    print(result.metrics.get("speech_metric_interpretation", "Paired adaptive reruns"))
     display(HTML("<table><tr><th>Measurement</th><th>Result</th><th>Meaning</th></tr>" +
                  "".join("<tr>"+"".join(f"<td>{value}</td>" for value in row)+"</tr>" for row in metric_rows(result))+"</table>"))
     print("Before — same playback gain as after")
