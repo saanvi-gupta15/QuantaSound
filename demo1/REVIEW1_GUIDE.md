@@ -17,7 +17,7 @@
 
 **Does this cancel sound throughout the room?** No. The model targets one error microphone. Cancellation is spatially dependent.
 
-**Does the broadband demo prove real-world broadband ANC?** No. It uses low-pass noise, causal preview, known FIR paths and no hardware noise or clipping. These are deliberately favorable teaching conditions.
+**Does the broadband demo prove real-world broadband ANC?** No. It uses low-pass noise, causal preview and known FIR paths. An independent ear disturbance of standard deviation 0.003 supplies an explicit noise floor, but this is not a validated hardware noise model; there is no clipping or time-varying fit. These remain favorable teaching conditions.
 
 **How was SNR calculated?** Demo B uses separate known target/noise components, filtered with the same linear filter. Demo C reports disturbance-to-residual power reduction, not speech SNR. Measurement windows are recorded in the JSON.
 

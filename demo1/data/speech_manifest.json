@@ -1,0 +1,7 @@
+{
+  "example": "libri1",
+  "file": "libri1.ogg",
+  "sha256": "a284612b46af0535f7e1873758c4387bb8369f6dbbe192ffdec1f171108f98dd",
+  "source": "https://librosa.org/data/audio/5703-47212-0000.ogg",
+  "analysis_duration_seconds": 5
+}

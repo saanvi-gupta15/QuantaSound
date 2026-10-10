@@ -1,0 +1,8 @@
+The Ashiel Mystery
+==================
+Attribution: Marion Bryce (author), Garth Comira (reader)
+Corpus:      LibriSpeech SLR12
+License:     CC-BY-4.0
+Source:      https://www.openslr.org/12/
+
+An excerpt from The Ashiel Mystery: A Detective Story, chapter XVI.

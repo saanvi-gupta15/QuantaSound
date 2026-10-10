@@ -18,6 +18,12 @@ def test_zero_learning_is_uncancelled_baseline():
     np.testing.assert_array_equal(result.error, result.disturbance)
 
 
+def test_uncorrelated_ear_disturbance_is_included_in_error():
+    extra = np.random.default_rng(2).normal(0, 0.003, 100)
+    result = fxlms(np.zeros(100), [0,1], [0,0.5], additive_disturbance=extra)
+    np.testing.assert_array_equal(result.error, extra)
+
+
 @pytest.mark.parametrize("kind", ["tonal", "broadband"])
 def test_fxlms_reduces_noise(kind):
     _, result, metrics = anc_example(kind)

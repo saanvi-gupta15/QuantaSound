@@ -1,0 +1,35 @@
+[
+  {
+    "filename": "1-18527-A-44.wav",
+    "fold": "1",
+    "target": "44",
+    "category": "engine",
+    "esc10": "False",
+    "src_file": "18527",
+    "take": "A",
+    "sha256": "83eb3e6065246fd87d1acbbe414aa5bfb7c2081a57c188713cdc017819ffc38f",
+    "url": "https://raw.githubusercontent.com/karolpiczak/ESC-50/33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6/audio/1-18527-A-44.wav"
+  },
+  {
+    "filename": "1-31482-A-42.wav",
+    "fold": "1",
+    "target": "42",
+    "category": "siren",
+    "esc10": "False",
+    "src_file": "31482",
+    "take": "A",
+    "sha256": "e4c640a001c2abe808389c90b90ba7084fb1922d58235e3ec95c18c4afb4ef5c",
+    "url": "https://raw.githubusercontent.com/karolpiczak/ESC-50/33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6/audio/1-31482-A-42.wav"
+  },
+  {
+    "filename": "1-137-A-32.wav",
+    "fold": "1",
+    "target": "32",
+    "category": "keyboard_typing",
+    "esc10": "False",
+    "src_file": "137",
+    "take": "A",
+    "sha256": "d68e4716f74f073be8f78f5fe8e45daf7c09b0ec0575b21f57989d803536abb3",
+    "url": "https://raw.githubusercontent.com/karolpiczak/ESC-50/33c8ce9eb2cf0b1c2f8bcf322eb349b6be34dbb6/audio/1-137-A-32.wav"
+  }
+]

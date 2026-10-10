@@ -40,7 +40,8 @@ class ANCResult:
     weights: np.ndarray
 
 
-def fxlms(x, primary, secondary, secondary_estimate=None, length=32, mu=0.003):
+def fxlms(x, primary, secondary, secondary_estimate=None, length=32, mu=0.003,
+          additive_disturbance=None):
     """Simulate e=d-S*y, w <- w+mu*e*x_filtered.
 
     Physical loudspeaker command is -y under this sign convention. Both the
@@ -57,6 +58,11 @@ def fxlms(x, primary, secondary, secondary_estimate=None, length=32, mu=0.003):
     if any(h.ndim != 1 or h.size == 0 or not np.all(np.isfinite(h)) for h in (p, s, sh)):
         raise ValueError("Paths must be finite nonempty FIR arrays")
     d = signal.lfilter(p, [1.0], x)
+    if additive_disturbance is not None:
+        extra = np.asarray(additive_disturbance, dtype=float)
+        if extra.shape != x.shape or not np.all(np.isfinite(extra)):
+            raise ValueError("Additive disturbance must match the finite reference shape")
+        d = d + extra
     xf = signal.lfilter(sh, [1.0], x)
     w = np.zeros(length)
     xb, xfb, yb = np.zeros(length), np.zeros(length), np.zeros(len(s))
@@ -88,12 +94,17 @@ def anc_example(kind="tonal", sr=8000, seconds=8, seed=7):
     # Primary delay 6 samples > secondary delay 2: causal reference preview.
     p = np.r_[np.zeros(6), 0.8, 0.25, -0.1]
     s = np.array([0., 0., 0.7, 0.2, -0.05])
-    result = fxlms(x, p, s)
+    # Uncorrelated ear disturbance cannot be predicted from the reference.
+    # Explicit noise floor prevents a perfect tone reporting floating-point cancellation.
+    extra = np.random.default_rng(seed+100).normal(0, 0.003, size=t.size)
+    result = fxlms(x, p, s, additive_disturbance=extra)
     tail = slice(len(x)//2, None)
     metrics = {"noise_reduction_db": power_db_ratio(result.disturbance[tail], result.error[tail]),
                "whole_run_reduction_db": power_db_ratio(result.disturbance, result.error),
                "measurement_start_s": seconds/2, "measurement_end_s": seconds,
                "sample_rate_hz": sr, "mu": 0.003, "controller_taps": 32,
                "primary_fir": p.tolist(), "secondary_fir": s.tolist(),
-               "known_secondary_path": True, "noise_kind": kind}
+               "known_secondary_path": True, "noise_kind": kind,
+               "uncorrelated_ear_disturbance_std": 0.003,
+               "uncorrelated_ear_disturbance_seed": seed+100}
     return t, result, metrics

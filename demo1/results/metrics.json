@@ -1,0 +1,205 @@
+{
+  "scope": "Review 1 simulation; no live hardware ANC or learned user personalization",
+  "python": "3.12.14",
+  "versions": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2",
+    "librosa": "1.0.0",
+    "soundfile": "0.14.0",
+    "scikit-learn": "1.9.1"
+  },
+  "demo_a": [
+    {
+      "label": "engine",
+      "file": "1-18527-A-44.wav",
+      "peak_hz": 39.0625,
+      "energy_10_percent_hz": 31.25,
+      "energy_90_percent_hz": 101.5625
+    },
+    {
+      "label": "siren",
+      "file": "1-31482-A-42.wav",
+      "peak_hz": 578.125,
+      "energy_10_percent_hz": 562.5,
+      "energy_90_percent_hz": 734.375
+    },
+    {
+      "label": "keyboard_typing",
+      "file": "1-137-A-32.wav",
+      "peak_hz": 7.8125,
+      "energy_10_percent_hz": 39.0625,
+      "energy_90_percent_hz": 4351.5625
+    },
+    {
+      "label": "speech (LibriSpeech, separate from ESC-50)",
+      "file": "libri1.ogg",
+      "peak_hz": 85.9375,
+      "energy_10_percent_hz": 85.9375,
+      "energy_90_percent_hz": 484.375
+    }
+  ],
+  "demo_b": {
+    "input_snr_db": -1.9654372621424223,
+    "output_component_snr_db": 21.207714420885768,
+    "snr_improvement_db": 23.17315168302819,
+    "clean_reference_sdr_db": 13.305312697511829,
+    "measurement_start_s": 0.25
+  },
+  "demo_c_tonal": {
+    "noise_reduction_db": 40.98795811082948,
+    "whole_run_reduction_db": 27.367254338848092,
+    "measurement_start_s": 4.0,
+    "measurement_end_s": 8,
+    "sample_rate_hz": 8000,
+    "mu": 0.003,
+    "controller_taps": 32,
+    "primary_fir": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.8,
+      0.25,
+      -0.1
+    ],
+    "secondary_fir": [
+      0.0,
+      0.0,
+      0.7,
+      0.2,
+      -0.05
+    ],
+    "known_secondary_path": true,
+    "noise_kind": "tonal",
+    "uncorrelated_ear_disturbance_std": 0.003,
+    "uncorrelated_ear_disturbance_seed": 107
+  },
+  "demo_c_broadband": {
+    "noise_reduction_db": 24.249550973736618,
+    "whole_run_reduction_db": 17.110947356129024,
+    "measurement_start_s": 4.0,
+    "measurement_end_s": 8,
+    "sample_rate_hz": 8000,
+    "mu": 0.003,
+    "controller_taps": 32,
+    "primary_fir": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.8,
+      0.25,
+      -0.1
+    ],
+    "secondary_fir": [
+      0.0,
+      0.0,
+      0.7,
+      0.2,
+      -0.05
+    ],
+    "known_secondary_path": true,
+    "noise_kind": "broadband",
+    "uncorrelated_ear_disturbance_std": 0.003,
+    "uncorrelated_ear_disturbance_seed": 107
+  },
+  "quantum_teaser": {
+    "status": "PRELIMINARY: toy offline simulation; no quantum advantage claim",
+    "sources": [
+      "engine",
+      "typing",
+      "speech",
+      "siren"
+    ],
+    "exact_bits": [
+      1,
+      1,
+      0,
+      0
+    ],
+    "exact_cost": -3.4000000000000004,
+    "qaoa_expected_cost": 0.848086472153696,
+    "qaoa_expected_gap": 4.248086472153696,
+    "optimal_probability": 0.2698701171967281,
+    "most_likely_bits": [
+      1,
+      1,
+      0,
+      0
+    ],
+    "optimizer_success": true,
+    "objective_evaluations": 265,
+    "exact_argmin_seconds": 9.60000033956021e-06,
+    "qaoa_optimization_seconds": 0.01111970000056317,
+    "timing_scope": "Shared cost table excluded; timings are illustrative, not a scaling study"
+  },
+  "classifier": {
+    "status": "PRELIMINARY single-label isolated-clip classification",
+    "classes": [
+      "engine",
+      "siren",
+      "keyboard_typing",
+      "rain",
+      "dog"
+    ],
+    "train_count": 160,
+    "test_count": 40,
+    "accuracy": 0.775,
+    "balanced_accuracy": 0.775,
+    "chance_accuracy": 0.2,
+    "confusion_matrix": [
+      [
+        5,
+        0,
+        0,
+        3,
+        0
+      ],
+      [
+        1,
+        6,
+        0,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        6,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        0,
+        7,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        7
+      ]
+    ],
+    "training_folds": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "test_fold": 5,
+    "source_overlap": 0,
+    "feature": "20 MFCC means and standard deviations, 16 kHz mono",
+    "seed": 7,
+    "trees": 200,
+    "test_used_for_tuning": false
+  }
+}

@@ -39,7 +39,9 @@ import librosa
 for label, path in demo_clips():
     samples, sr = librosa.load(path, sr=16000, duration=5)
     print(label)
-    display(Audio(samples, rate=sr, normalize=False))"""),
+    playback = samples * (0.9 / max(1.0, float(np.max(np.abs(samples)))))
+    display(Audio(playback, rate=sr, normalize=False))
+# Playback gain only prevents resampling overshoot; spectral plots use the original samples."""),
         md("""## B · Ordinary digital filtering — not ANC
 Known target: 1 kHz sine. Interference: 200 Hz hum plus weak white noise. A third-order Butterworth band-stop removes 150–250 Hz using causal `lfilter`.
 
@@ -56,7 +58,7 @@ print(json.dumps(filtering_metrics, indent=2))"""),
 
 `error e = d − S*y`; update `w ← w + μ e x_filtered`, where `x_filtered = S_hat*x`.
 
-The physical speaker command is **−y** with this sign convention. The secondary path stores past controller samples; it is not an instantaneous multiply. We assume `S_hat = S`, a stationary linear acoustic path and an ideal external reference. Primary delay (6 samples) exceeds secondary delay (2 samples), allowing a causal controller. These favorable assumptions must be stated to judges.
+The physical speaker command is **−y** with this sign convention. The secondary path stores past controller samples; it is not an instantaneous multiply. We assume `S_hat = S`, a stationary linear acoustic path and an ideal external reference. Primary delay (6 samples) exceeds secondary delay (2 samples), allowing a causal controller. These favorable assumptions must be stated to judges. An independent Gaussian disturbance (standard deviation 0.003, seed 107) is added at the ear in both cases; it cannot be predicted from the reference and creates an explicit residual noise floor.
 
 Report noise reduction = 10 log₁₀(mean(d²)/mean(e²)) on the **same final 4 seconds**; whole-run reduction also includes adaptation. These numbers describe this synthetic experiment, not headphone attenuation specifications."""),
         code("""anc_metrics = {}
@@ -71,7 +73,7 @@ for kind in ('tonal', 'broadband'):
         display(Audio(filename=str(RESULTS / f'c_{kind}_{stage}.wav')))
 # These sounds were generated in simulation; no microphone/speaker feedback loop runs here."""),
         md("""### Explain the physics and limits
-Destructive interference reduces pressure at the modeled error microphone. Lower frequencies allow more timing tolerance; broadband cancellation also needs reference preview and an accurate secondary-path model. Our broadband input is low-pass noise below approximately 900 Hz, not unrestricted white noise. Perfect simulated paths can yield unusually large reductions. Real hardware adds sensor noise, latency, clipping, changing fit and spatial effects.
+Destructive interference reduces pressure at the modeled error microphone. Lower frequencies allow more timing tolerance; broadband cancellation also needs reference preview and an accurate secondary-path model. Our broadband input is low-pass noise below approximately 900 Hz, not unrestricted white noise. Without the explicitly added independent ear disturbance, a perfectly predictable tone can approach numerical precision. Real hardware adds further sensor noise, latency, clipping, changing fit and spatial effects.
 
 If divergence occurs, reduce μ and check the subtraction/update sign. If adaptation does nothing, inspect the secondary-path history and filtered reference. This demo does not yet include RLS, live audio I/O, sound separation or online user learning."""),
         md("""## Preliminary teaser · Five-class classifier

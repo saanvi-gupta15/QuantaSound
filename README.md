@@ -5,6 +5,8 @@ A reproducible Python demonstration of the signal-processing foundations for per
 
 **Start here:** [executed review notebook](demo1/Review1.ipynb) · [presentation guide](demo1/REVIEW1_GUIDE.md) · [measured results](demo1/results/metrics.json).
 
+For a kernel-free rehearsal, download [Review1.html](demo1/Review1.html) and open it in a browser. Figures and audio are embedded; rerunning or changing preferences requires the notebook.
+
 | Demo | What works now | Scope |
 |---|---|---|
 | A | Real engine, siren, keyboard and speech waveforms/mel spectrograms; measured frequency notes | Offline audio analysis |
@@ -14,6 +16,18 @@ A reproducible Python demonstration of the signal-processing foundations for per
 | Quantum teaser | Four-bit preference QUBO, p=1 QAOA statevector simulation, exact classical baseline | Preliminary offline proof of concept |
 
 This is **not yet a real-time personalized headphone system**. Learned user feedback, separation of overlapping sources, live audio I/O and hardware validation are future work. Modern ANC systems can already adapt to fit/environment; personalization is the project direction, not a claim that every existing headphone treats every listener identically. Quantum advantage is a research question.
+
+## Recorded Review 1 results
+
+| Measurement | Result | Interpretation |
+|---|---:|---|
+| Filtering component SNR improvement | 23.17 dB | Known 1 kHz target and 200 Hz hum + white noise |
+| FxLMS tonal noise reduction | 40.99 dB | Final 4–8 s; ideal known paths plus explicit independent ear disturbance |
+| FxLMS low-frequency broadband reduction | 24.25 dB | Same measurement window and path assumptions |
+| Classifier held-out accuracy | 77.5% (31/40) | Five classes; official fold 5; no source overlap |
+| QAOA probability of exact optimum | 26.99% | Four-qubit p=1 toy problem; no quantum advantage |
+
+The complete notebook was executed successfully and **9 tests passed**. Full parameters, component SNR/SDR, whole-run ANC metrics, confusion matrix and QAOA cost gap are in `demo1/results/metrics.json`. Results are educational simulations/baselines, not product specifications.
 
 ## Setup (Python 3.12 recommended)
 
