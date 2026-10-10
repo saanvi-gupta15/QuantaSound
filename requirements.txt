@@ -9,3 +9,5 @@ nbclient>=0.10,<1
 ipykernel>=6.29,<8
 jupyterlab>=4,<5
 pytest>=8,<10
+ipywidgets>=8,<9
+qiskit>=2,<3

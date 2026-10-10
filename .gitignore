@@ -7,3 +7,4 @@ demo1/data/speech/
 demo1/data/features.npz
 *.tmp
 .DS_Store
+demo2/local/

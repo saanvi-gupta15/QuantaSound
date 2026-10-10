@@ -3,6 +3,13 @@
 
 A reproducible Python demonstration of the signal-processing foundations for personalized noise cancellation, with preliminary AI and quantum experiments.
 
+**New personalization milestone:** [interactive Python notebook](demo2/Personalization.ipynb) · [feature guide](demo2/README.md) · [four-scenario results](demo2/results/summary.json). Select sounds, hear before/after simulated ANC, measure residual noise and speech effects, and save named preference profiles. Qiskit now implements the offline QAOA circuit alongside the independently checked NumPy simulator.
+
+```bash
+python -m pip install -r requirements.txt
+python -m jupyterlab demo2/Personalization.ipynb
+```
+
 **Start here:** [executed review notebook](demo1/Review1.ipynb) · [presentation guide](demo1/REVIEW1_GUIDE.md) · [measured results](demo1/results/metrics.json).
 
 For a kernel-free rehearsal, download [Review1.html](demo1/Review1.html) and open it in a browser. Figures and audio are embedded; rerunning or changing preferences requires the notebook.
@@ -15,7 +22,7 @@ For a kernel-free rehearsal, download [Review1.html](demo1/Review1.html) and ope
 | AI teaser | MFCC + random forest; five ESC-50 classes; held-out official fold | Preliminary isolated-clip baseline |
 | Quantum teaser | Four-bit preference QUBO, p=1 QAOA statevector simulation, exact classical baseline | Preliminary offline proof of concept |
 
-This is **not yet a real-time personalized headphone system**. Learned user feedback, separation of overlapping sources, live audio I/O and hardware validation are future work. Modern ANC systems can already adapt to fit/environment; personalization is the project direction, not a claim that every existing headphone treats every listener identically. Quantum advantage is a research question.
+This is **not yet a real-time personalized headphone system**. Explicit user choices now drive the known-reference simulation in `demo2`; learned user feedback, separation of overlapping sources, live audio I/O and hardware validation remain future work. Modern ANC systems can already adapt to fit/environment; personalization is the project direction, not a claim that every existing headphone treats every listener identically. Quantum advantage is a research question.
 
 ## Recorded Review 1 results
 
@@ -73,6 +80,7 @@ python -m demo1.run --classifier # also the five-class classifier
 - `demo1/quantum.py`: explicit QUBO and small QAOA statevector simulator.
 - `demo1/results/`: measured run, presentation PNGs and synthetic WAV pairs.
 - `tests/`: acoustic path, adaptation, metrics and quantum-state checks.
+- `demo2/`: connected personalized simulation, Python widget controls, local profiles, four-scenario results and Qiskit cross-checks.
 
 ## Collaboration
 
