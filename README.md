@@ -5,7 +5,9 @@ A reproducible Python demonstration of the signal-processing foundations for per
 
 **New personalization milestone:** [interactive Python notebook](demo2/Personalization.ipynb) · [feature guide](demo2/README.md) · [four-scenario results](demo2/results/summary.json). Select sounds, hear before/after simulated ANC, measure residual noise and speech effects, and save named preference profiles. Qiskit now implements the offline QAOA circuit alongside the independently checked NumPy simulator.
 
-**Arbitrary-audio milestone:** [AI audio pipeline](demo3/README.md) and `python -m demo3.app`. Upload or record any clip, classify its mixture, estimate a noise profile, produce a denoised WAV and receive an explainable report. This is AI-assisted spectral denoising; it is deliberately reported separately from true reference-based ANC.
+**Current AI dashboard:** [trained recognition + source separation + simulated ANC](demo4/README.md), launched with `python -m demo4.app` after installing `requirements-ai.txt`. AudioSet-trained AST suggests sounds, the user chooses a target, pretrained AudioSep estimates its waveform, and a control filter produces simulated anti-noise and ear output. This is offline simulation, not live headphone cancellation.
+
+**Legacy Demo 3:** the earlier upload demo uses heuristic labels and a spectral gate, not a trained sound classifier. It is retained for history and is superseded by Demo 4. Do not present it as the full AI/ANC pipeline.
 
 ```bash
 python -m pip install -r requirements.txt
@@ -24,7 +26,7 @@ For a kernel-free rehearsal, download [Review1.html](demo1/Review1.html) and ope
 | AI teaser | MFCC + random forest; five ESC-50 classes; held-out official fold | Preliminary isolated-clip baseline |
 | Quantum teaser | Four-bit preference QUBO, p=1 QAOA statevector simulation, exact classical baseline | Preliminary offline proof of concept |
 
-This is **not yet a real-time personalized headphone system**. Explicit user choices now drive the known-reference simulation in `demo2`; learned user feedback, separation of overlapping sources, live audio I/O and hardware validation remain future work. Modern ANC systems can already adapt to fit/environment; personalization is the project direction, not a claim that every existing headphone treats every listener identically. Quantum advantage is a research question.
+This is **not yet a real-time personalized headphone system**. Demo 2 uses known references; Demo 4 integrates a pretrained source estimator. Learned user feedback, continuous low-latency headphone control and hardware validation remain future work. Modern ANC systems can already adapt to fit/environment; personalization is the project direction, not a claim that every existing headphone treats every listener identically. Quantum advantage is a research question.
 
 ## Recorded Review 1 results
 
