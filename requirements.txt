@@ -11,3 +11,4 @@ jupyterlab>=4,<5
 pytest>=8,<10
 ipywidgets>=8,<9
 qiskit>=2,<3
+gradio>=5,<7

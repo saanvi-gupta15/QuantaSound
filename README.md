@@ -5,6 +5,8 @@ A reproducible Python demonstration of the signal-processing foundations for per
 
 **New personalization milestone:** [interactive Python notebook](demo2/Personalization.ipynb) · [feature guide](demo2/README.md) · [four-scenario results](demo2/results/summary.json). Select sounds, hear before/after simulated ANC, measure residual noise and speech effects, and save named preference profiles. Qiskit now implements the offline QAOA circuit alongside the independently checked NumPy simulator.
 
+**Arbitrary-audio milestone:** [AI audio pipeline](demo3/README.md) and `python -m demo3.app`. Upload or record any clip, classify its mixture, estimate a noise profile, produce a denoised WAV and receive an explainable report. This is AI-assisted spectral denoising; it is deliberately reported separately from true reference-based ANC.
+
 ```bash
 python -m pip install -r requirements.txt
 python -m jupyterlab demo2/Personalization.ipynb
